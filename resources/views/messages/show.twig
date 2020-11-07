@@ -1,0 +1,10 @@
+{% extends 'app.twig' %}
+
+{% block content %}
+    <div class="bg-white shadow rounded-lg my-4 p-4">
+        <p class="text-dark mb-0">{{ message.message }}</p>
+        {% if message.file %}
+            <img src="/uploads/{{ message.file }}" class="img-fluid mt-2" alt="{{ app_name }}">
+        {% endif %}
+    </div>
+{% endblock %}

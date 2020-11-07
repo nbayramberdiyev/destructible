@@ -1,0 +1,35 @@
+{% extends 'app.twig' %}
+
+{% block content %}
+    {% if messages.success %}
+        <div class="alert alert-success shadow rounded-lg my-4" role="alert">
+            {{ messages.success | first }}
+        </div>
+    {% endif %}
+    <form method="post" action="{{ url_for('messages.store') }}" class="bg-white shadow rounded-lg my-4 p-4" enctype="multipart/form-data" autocomplete="off">
+        <div class="form-group">
+            <label for="email">Email <span class="text-danger">*</span></label>
+            <input type="email" id="email" name="email" class="form-control bg-light" required>
+        </div>
+        <div class="form-group">
+            <label for="message">Message <span class="text-danger">*</span></label>
+            <textarea id="message" name="message" class="form-control bg-light" rows="5" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="file">File</label>
+            <input type="file" id="file" name="file" class="form-control d-none" accept="image/png, image/jpeg">
+            <div id="filePreview">
+                <!--<div class="btn btn-block border text-left mb-3">
+                    filename.jpg
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#FF9999">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </div>-->
+            </div>
+            <button type="button" class="btn btn-block btn-browse border">Browse</button>
+        </div>
+        <input type="hidden" name="{{ csrf.keys.name }}" value="{{ csrf.name }}">
+        <input type="hidden" name="{{ csrf.keys.value }}" value="{{ csrf.value }}">
+        <button type="submit" class="btn btn-submit d-flex mx-auto mt-2">Send Message</button>
+    </form>
+{% endblock %}
