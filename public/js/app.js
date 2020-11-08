@@ -12,6 +12,7 @@ $(function () {
         }
 
         if (! RegExp('(.*?)\.(jpg|jpeg|png)$').test(file.name.toLowerCase())) {
+            $(this).val('');
             return alert('The file "' + file.name + '" has invalid format.');
         }
 
