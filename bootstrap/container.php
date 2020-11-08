@@ -10,6 +10,7 @@ use Slim\Csrf\Guard;
 use Slim\Factory\AppFactory;
 use Slim\Flash\Messages;
 use Slim\Views\Twig;
+use Twig\Extension\DebugExtension;
 
 $containerBuilder = new ContainerBuilder();
 
@@ -41,11 +42,14 @@ $containerBuilder->addDefinitions([
     'view' => function (ContainerInterface $container) {
         $twig =Twig::create(__DIR__ . '/../resources/views', [
             'cache' => false,
+            'debug' => $container->get('config')['app']['debug'],
         ]);
 
         $twig->addExtension(new CsrfExtension($container->get('csrf')));
+        $twig->addExtension(new DebugExtension());
 
         $twig->getEnvironment()->addGlobal('messages', $container->get('flash')->getMessages());
+        $twig->getEnvironment()->addGlobal('errors', $container->get('flash')->getFirstMessage('errors'));
         $twig->getEnvironment()->addGlobal('app_name', $container->get('config')['app']['name']);
 
         return $twig;

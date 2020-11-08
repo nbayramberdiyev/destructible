@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use Exception;
+use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\UploadedFileInterface as UploadedFile;
@@ -18,10 +19,10 @@ class MessageController extends Controller
      *
      * @param Request $request
      * @param Response $response
-     * @param $args
+     * @param array $args
      * @return Response
      */
-    public function show(Request $request, Response $response, $args)
+    public function show(Request $request, Response $response, array $args)
     {
         ['uuid' => $uuid] = $args;
 
@@ -39,27 +40,34 @@ class MessageController extends Controller
      *
      * @param Request $request
      * @param Response $response
-     * @param $args
      * @return Response
      * @throws Exception
      */
-    public function store(Request $request, Response $response, $args)
+    public function store(Request $request, Response $response)
     {
-        ['email' => $email, 'message' => $message] = $request->getParsedBody();
-
-        $file = $request->getUploadedFiles()['file'];
-        $filename = null;
-
-        if ($file->getError() === UPLOAD_ERR_OK) {
-            $filename = $this->uploadFile($_SERVER['DOCUMENT_ROOT'] . '/uploads', $file);
-        }
-
-        $message = Message::create([
-            'message' => $message,
-            'file'    => $filename,
+        $data = $this->validate($request, [
+            'email'   => ['required', 'email'],
+            'message' => ['required'],
         ]);
 
-        $this->sendEmail($email, $message);
+        $file = $request->getUploadedFiles()['file'];
+
+        if ($file->getError() === UPLOAD_ERR_OK) {
+            $file = $this->validateFile($file, [
+                'file.type' => [
+                    ['in', ['image/jpeg', 'image/png'], 'message' => 'The file must be a type of JPG/JPEG or PNG.'],
+                ],
+                'file.size' => [
+                    ['max', 1000000, 'message' => 'The file size must be less than or equal 1 MB.'],
+                ],
+            ]);
+
+            $data['file'] = $this->uploadFile($_SERVER['DOCUMENT_ROOT'] . '/uploads', $file);
+        }
+
+        $message = Message::create(Arr::only($data, ['message', 'file']));
+
+        $this->sendEmail($data['email'], $message);
 
         $this->flash('success', 'Message has been sent.');
 

@@ -21,7 +21,8 @@
         "illuminate/events": "^8.13",
         "ramsey/uuid": "^4.1",
         "swiftmailer/swiftmailer": "^6.0",
-        "zeuxisoo/slim-whoops": "^0.7.2"
+        "zeuxisoo/slim-whoops": "^0.7.2",
+        "vlucas/valitron": "^1.4"
     },
     "require-dev": {
         "symfony/var-dumper": "^5.1"

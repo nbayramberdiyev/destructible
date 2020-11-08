@@ -9,15 +9,25 @@
     <form method="post" action="{{ url_for('messages.store') }}" class="bg-white shadow rounded-lg my-4 p-4" enctype="multipart/form-data" autocomplete="off">
         <div class="form-group">
             <label for="email">Email <span class="text-danger">*</span></label>
-            <input type="email" id="email" name="email" class="form-control bg-light" required>
+            <input type="email" id="email" name="email" class="form-control bg-light{{ errors.email ? ' is-invalid' }}" required>
+            {% if errors.email %}
+                <div class="invalid-feedback">
+                    {{ errors.email | first }}
+                </div>
+            {% endif %}
         </div>
         <div class="form-group">
             <label for="message">Message <span class="text-danger">*</span></label>
-            <textarea id="message" name="message" class="form-control bg-light" rows="5" required></textarea>
+            <textarea id="message" name="message" class="form-control bg-light{{ errors.message ? ' is-invalid' }}" rows="5" required></textarea>
+            {% if errors.message %}
+                <div class="invalid-feedback">
+                    {{ errors.message | first }}
+                </div>
+            {% endif %}
         </div>
         <div class="form-group">
             <label for="file">File</label>
-            <input type="file" id="file" name="file" class="form-control d-none" accept="image/png, image/jpeg">
+            <input type="file" id="file" name="file" class="form-control d-none{{ errors['file.type'] or errors['file.size'] ? ' is-invalid' }}" accept="image/png, image/jpeg">
             <div id="filePreview">
                 <!--<div class="btn btn-block border text-left mb-3">
                     filename.jpg
@@ -27,6 +37,15 @@
                 </div>-->
             </div>
             <button type="button" class="btn btn-block btn-browse border">Browse</button>
+            {% if errors['file.type'] %}
+                <div class="invalid-feedback">
+                    {{ errors['file.type'] | first }}
+                </div>
+            {% elseif errors['file.size'] %}
+                <div class="invalid-feedback">
+                    {{ errors['file.size'] | first }}
+                </div>
+            {% endif %}
         </div>
         <input type="hidden" name="{{ csrf.keys.name }}" value="{{ csrf.name }}">
         <input type="hidden" name="{{ csrf.keys.value }}" value="{{ csrf.value }}">

@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Exceptions\ValidationException;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\UploadedFileInterface as UploadedFile;
+use Valitron\Validator;
 
 abstract class Controller
 {
@@ -44,5 +48,52 @@ abstract class Controller
     protected function flash(string $key, string $message)
     {
         return $this->container->get('flash')->addMessage($key, $message);
+    }
+
+    /**
+     * Validate the given request with the given rules.
+     *
+     * @param Request $request
+     * @param array $rules
+     * @return array|object|null
+     * @throws ValidationException
+     */
+    public function validate(Request $request, array $rules = [])
+    {
+        $validator = new Validator($params = $request->getParsedBody());
+
+        $validator->mapFieldsRules($rules);
+
+        if (!$validator->validate()) {
+            throw new ValidationException($validator);
+        }
+
+        return $params;
+    }
+
+    /**
+     * Validate the given file with the given rules.
+     *
+     * @param UploadedFile $uploadedFile
+     * @param array $rules
+     * @return UploadedFile
+     * @throws ValidationException
+     */
+    public function validateFile(UploadedFile $uploadedFile, array $rules = [])
+    {
+        $validator = new Validator([
+            'file' => [
+                'type' => $uploadedFile->getClientMediaType(),
+                'size' => $uploadedFile->getSize(),
+            ]
+        ]);
+
+        $validator->mapFieldsRules($rules);
+
+        if (!$validator->validate()) {
+            throw new ValidationException($validator);
+        }
+
+        return $uploadedFile;
     }
 }

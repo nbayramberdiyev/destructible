@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Handler\ErrorHandler;
+use App\Exceptions\Handler;
 use Slim\Views\TwigMiddleware;
 use Zeuxisoo\Whoops\Slim\WhoopsMiddleware;
 
@@ -18,6 +18,6 @@ return function (Slim\App $app) {
     } else {
         $app
             ->addErrorMiddleware(false, true, true)
-            ->setDefaultErrorHandler(new ErrorHandler($app->getResponseFactory(), $app->getContainer()));
+            ->setDefaultErrorHandler(new Handler($app->getResponseFactory(), $app->getContainer()));
     }
 };
